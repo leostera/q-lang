@@ -1,4 +1,3 @@
-use crate::diagnostic::Diagnostic;
 use crate::error::*;
 use crate::lexer::Lexer;
 use crate::parsetree::*;
@@ -13,12 +12,15 @@ pub trait Parse {
 pub struct Parser {
     source: String,
     module_name: String,
-    diagnostics: Vec<Diagnostic>,
+    diagnostics: Vec<ParseError>,
 }
 
 impl Parser {
     pub fn from_file(filename: &Path) -> Result<Self, ParseError> {
-        let source = std::fs::read_to_string(&filename).map_err(ParseError::IOError)?;
+        let source =
+            std::fs::read_to_string(&filename).map_err(|_| ParseError::CouldNotReadFile {
+                filename: filename.to_path_buf(),
+            })?;
         let module_name = filename.file_name().unwrap().to_str().unwrap().to_string();
         let parser = Parser {
             module_name,
@@ -36,7 +38,7 @@ impl Parser {
         }
     }
 
-    pub fn diagnostics(&self) -> &[Diagnostic] {
+    pub fn diagnostics(&self) -> &[ParseError] {
         &self.diagnostics
     }
 
@@ -48,11 +50,10 @@ impl Parser {
         while lexer.peek().is_some() {
             match ModuleItem::from_lexer(&mut lexer) {
                 Ok(item) => items.push(item),
-                Err(ParseError::Diagnostic(diag)) => {
+                Err(err) => {
                     // TODO(@ostera): skip until the next valid token
-                    self.diagnostics.push(diag);
+                    self.diagnostics.push(err);
                 }
-                Err(error) => return Err(error),
             }
         }
 
@@ -93,11 +94,11 @@ mod tests {
         assert_eq!(
             parser.diagnostics,
             vec![
-                Diagnostic::UnexpectedSymbolFound {
+                ParseError::UnexpectedSymbolFound {
                     expected: Token::Equal,
                     found: Token::QuestionMark
                 },
-                Diagnostic::UnexpectedSymbolFound {
+                ParseError::UnexpectedSymbolFound {
                     expected: Token::Id("some_id".to_string()),
                     found: Token::LiteralString("Q-Lang".to_string())
                 }

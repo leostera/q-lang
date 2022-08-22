@@ -1,4 +1,3 @@
-use crate::diagnostic::Diagnostic;
 use crate::error::ParseError;
 use crate::token::Token;
 use logos::Logos;
@@ -40,10 +39,7 @@ impl<'source> Lexer<'source> {
         if found == expected {
             Ok(())
         } else {
-            Err(ParseError::Diagnostic(Diagnostic::UnexpectedSymbolFound {
-                expected,
-                found,
-            }))
+            Err(ParseError::UnexpectedSymbolFound { expected, found })
         }
     }
 }

@@ -1,4 +1,3 @@
-use crate::diagnostic::Diagnostic;
 use crate::error::ParseError;
 use crate::lexer::Lexer;
 use crate::parser::Parse;
@@ -11,10 +10,10 @@ impl Parse for Id {
     fn from_lexer(lexer: &mut Lexer) -> Result<Self, ParseError> {
         match lexer.next()? {
             Token::Id(id) => Ok(Id(id)),
-            token => Err(ParseError::Diagnostic(Diagnostic::UnexpectedSymbolFound {
+            token => Err(ParseError::UnexpectedSymbolFound {
                 expected: Token::Id("some_id".to_string()),
                 found: token,
-            })),
+            }),
         }
     }
 }
@@ -28,9 +27,7 @@ impl Parse for Expression {
     fn from_lexer(lexer: &mut Lexer) -> Result<Self, ParseError> {
         match lexer.next()? {
             Token::LiteralString(str) => Ok(Expression::LiteralString(str)),
-            token => Err(ParseError::Diagnostic(Diagnostic::ExpectedExpression {
-                found: token,
-            })),
+            token => Err(ParseError::ExpectedExpression { found: token }),
         }
     }
 }
@@ -46,7 +43,7 @@ impl Parse for ValueDeclaration {
         let name = Id::from_lexer(lexer)?;
         lexer.expect(Token::Equal)?;
         let value = Expression::from_lexer(lexer)
-            .map_err(|_| ParseError::Diagnostic(Diagnostic::MissingValueInValueDeclaration))?;
+            .map_err(|_| ParseError::MissingValueInValueDeclaration)?;
 
         Ok(Self { name, value })
     }
