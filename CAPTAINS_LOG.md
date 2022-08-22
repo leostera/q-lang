@@ -1,3 +1,9 @@
+# Mon Aug 22 21:12:01 CEST 2022
+
+-[x] be able to distinguish between a good EOF and an interrupted parser due to an EOF
+-[ ] get rid of diagnostic 
+-[ ] skip ahead on a parse error
+
 # Thu Aug 18 20:13:16 CEST 2022
 
 -[x] begin our parser
@@ -7,7 +13,7 @@
 
 For next time:
 * how do we ensure that all expressions get their diagnostic in,
-  even when we are out of a file?
+  even when we are out of a file (reached EOF)?
 
 * what is the distinction between parsing errors and diagnostics
 

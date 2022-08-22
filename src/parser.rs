@@ -45,10 +45,9 @@ impl Parser {
 
         let mut items = vec![];
 
-        loop {
+        while lexer.peek().is_some() {
             match ModuleItem::from_lexer(&mut lexer) {
                 Ok(item) => items.push(item),
-                Err(ParseError::EOF) => break,
                 Err(ParseError::Diagnostic(diag)) => {
                     // TODO(@ostera): skip until the next valid token
                     self.diagnostics.push(diag);
@@ -96,7 +95,7 @@ mod tests {
             vec![
                 Diagnostic::UnexpectedSymbolFound {
                     expected: Token::Equal,
-                    found: Token::Error
+                    found: Token::QuestionMark
                 },
                 Diagnostic::UnexpectedSymbolFound {
                     expected: Token::Id("some_id".to_string()),

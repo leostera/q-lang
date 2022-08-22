@@ -45,7 +45,8 @@ impl Parse for ValueDeclaration {
     fn from_lexer(lexer: &mut Lexer) -> Result<Self, ParseError> {
         let name = Id::from_lexer(lexer)?;
         lexer.expect(Token::Equal)?;
-        let value = Expression::from_lexer(lexer)?;
+        let value = Expression::from_lexer(lexer)
+            .map_err(|_| ParseError::Diagnostic(Diagnostic::MissingValueInValueDeclaration))?;
 
         Ok(Self { name, value })
     }

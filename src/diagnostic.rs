@@ -5,4 +5,6 @@ pub enum Diagnostic {
     UnexpectedSymbolFound { expected: Token, found: Token },
 
     ExpectedExpression { found: Token },
+
+    MissingValueInValueDeclaration,
 }

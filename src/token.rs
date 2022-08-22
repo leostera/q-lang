@@ -12,6 +12,9 @@ pub enum Token {
     #[token("=")]
     Equal,
 
+    #[token("?")]
+    QuestionMark,
+
     #[token(",")]
     Comma,
 
@@ -32,6 +35,9 @@ pub enum Token {
 
     #[token("}")]
     BraceRight,
+
+    #[regex("[0-9]+", |lex| lex.slice().parse())]
+    Number(u64),
 
     #[regex("[0-9]*[.][0-9]+", |lex| lex.slice().parse())]
     Float(f64),
