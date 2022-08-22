@@ -1,15 +1,12 @@
 use crate::error::*;
 use crate::lexer::Lexer;
 use crate::parsetree::*;
-use std::path::Path;
-
-pub trait Parse {
-    fn from_lexer(lexer: &mut Lexer) -> Result<Self, ParseError>
-    where
-        Self: Sized;
-}
+use crate::token::*;
+use miette::NamedSource;
+use std::path::{Path, PathBuf};
 
 pub struct Parser {
+    filename: PathBuf,
     source: String,
     module_name: String,
     diagnostics: Vec<ParseError>,
@@ -17,12 +14,10 @@ pub struct Parser {
 
 impl Parser {
     pub fn from_file(filename: &Path) -> Result<Self, ParseError> {
-        let source =
-            std::fs::read_to_string(&filename).map_err(|_| ParseError::CouldNotReadFile {
-                filename: filename.to_path_buf(),
-            })?;
+        let source = std::fs::read_to_string(&filename).unwrap();
         let module_name = filename.file_name().unwrap().to_str().unwrap().to_string();
         let parser = Parser {
+            filename: filename.to_path_buf(),
             module_name,
             source,
             diagnostics: vec![],
@@ -32,14 +27,21 @@ impl Parser {
 
     pub fn from_string(module_name: &str, source: &str) -> Self {
         Self {
+            filename: PathBuf::from("<none>"),
             module_name: module_name.to_string(),
             source: source.to_string(),
             diagnostics: vec![],
         }
     }
 
-    pub fn diagnostics(&self) -> &[ParseError] {
-        &self.diagnostics
+    pub fn diagnostics(self) -> Result<(), Diagnostics> {
+        if self.diagnostics.is_empty() {
+            Ok(())
+        } else {
+            Err(Diagnostics {
+                errors: self.diagnostics,
+            })
+        }
     }
 
     pub fn parse(&mut self) -> Result<Module, ParseError> {
@@ -48,11 +50,11 @@ impl Parser {
         let mut items = vec![];
 
         while lexer.peek().is_some() {
-            match ModuleItem::from_lexer(&mut lexer) {
+            match self.parse_module_item(&mut lexer) {
                 Ok(item) => items.push(item),
-                Err(err) => {
+                Err(error) => {
                     // TODO(@ostera): skip until the next valid token
-                    self.diagnostics.push(err);
+                    self.diagnostics.push(error)
                 }
             }
         }
@@ -61,6 +63,44 @@ impl Parser {
             name: Id(self.module_name.clone()),
             items,
         })
+    }
+
+    fn named_source(&self) -> NamedSource {
+        NamedSource::new(self.filename.to_str().unwrap(), self.source.clone())
+    }
+
+    fn parse_module_item(&self, lexer: &mut Lexer) -> Result<ModuleItem, ParseError> {
+        let vd = self.parse_value_declaration(lexer)?;
+        Ok(ModuleItem::ValueDeclaration(vd))
+    }
+
+    fn parse_value_declaration(&self, lexer: &mut Lexer) -> Result<ValueDeclaration, ParseError> {
+        let name = self.parse_id(lexer)?;
+        lexer.expect(Token::Equal)?;
+        let value = self.parse_expression(lexer).map_err(|_| {
+            let span = lexer.span();
+            let src = self.named_source();
+            ParseError::MissingValueInValueDeclaration { span, src }
+        })?;
+
+        Ok(ValueDeclaration { name, value })
+    }
+
+    fn parse_id(&self, lexer: &mut Lexer) -> Result<Id, ParseError> {
+        match lexer.next()? {
+            Token::Id(id) => Ok(Id(id)),
+            token => Err(ParseError::UnexpectedSymbolFound {
+                expected: Token::Id("some_id".to_string()),
+                found: token,
+            }),
+        }
+    }
+
+    fn parse_expression(&self, lexer: &mut Lexer) -> Result<Expression, ParseError> {
+        match lexer.next()? {
+            Token::LiteralString(str) => Ok(Expression::LiteralString(str)),
+            token => Err(ParseError::ExpectedExpression { found: token }),
+        }
     }
 }
 

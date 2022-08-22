@@ -1,1 +1,3 @@
-Hello = "Q-Lang!"
+Hello ? "wat"
+
+Hello =

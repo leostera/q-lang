@@ -9,10 +9,7 @@ fn main() -> miette::Result<()> {
         let path = std::path::PathBuf::from(&file);
         let mut parser = parser::Parser::from_file(&path)?;
         let _ = parser.parse()?;
-
-        for diag in parser.diagnostics() {
-            dbg!(diag);
-        }
+        let () = parser.diagnostics()?;
     }
     Ok(())
 }

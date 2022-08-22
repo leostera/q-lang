@@ -1,6 +1,7 @@
 use crate::error::ParseError;
 use crate::token::Token;
 use logos::Logos;
+use miette::SourceSpan;
 
 pub struct Lexer<'source> {
     lexer: logos::Lexer<'source, Token>,
@@ -14,6 +15,11 @@ impl<'source> Lexer<'source> {
             lexer,
             peeked: None,
         }
+    }
+
+    pub fn span(&self) -> SourceSpan {
+        let range = self.lexer.span();
+        (range.start, range.end - range.start).into()
     }
 
     pub fn next(&mut self) -> Result<Token, ParseError> {

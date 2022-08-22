@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 logos = "^0"
 thiserror = "1.0"
-miette = "5.3" 
+miette = { version = "5.3" , features = [ "fancy" ] }

@@ -1,8 +1,13 @@
 # Mon Aug 22 21:12:01 CEST 2022
 
 -[x] be able to distinguish between a good EOF and an interrupted parser due to an EOF
--[ ] get rid of diagnostic 
+-[x] get rid of diagnostic 
+-[x] display parse errors using miette
+
+Next steps:
 -[ ] skip ahead on a parse error
+* define the smallest set of constructs that make Q-lang turing complete
+* macro-expander
 
 # Thu Aug 18 20:13:16 CEST 2022
 
