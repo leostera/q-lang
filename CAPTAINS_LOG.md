@@ -1,20 +1,20 @@
 # Mon Aug 22 21:12:01 CEST 2022
 
--[x] be able to distinguish between a good EOF and an interrupted parser due to an EOF
--[x] get rid of diagnostic 
--[x] display parse errors using miette
+- [x] be able to distinguish between a good EOF and an interrupted parser due to an EOF
+- [x] get rid of diagnostic 
+- [x] display parse errors using miette
 
 Next steps:
--[ ] skip ahead on a parse error
+- [ ] skip ahead on a parse error
 * define the smallest set of constructs that make Q-lang turing complete
 * macro-expander
 
 # Thu Aug 18 20:13:16 CEST 2022
 
--[x] begin our parser
--[x] executable
--[x] play around with diagnostics
--[x] explore parse trait 
+- [x] begin our parser
+- [x] executable
+- [x] play around with diagnostics
+- [x] explore parse trait 
 
 For next time:
 * how do we ensure that all expressions get their diagnostic in,
@@ -24,8 +24,8 @@ For next time:
 
 # Wed Aug 17 21:48:47 CEST 2022
 
--[X] set up a repo that can build
--[X] begin a grammar
+- [X] set up a repo that can build
+- [X] begin a grammar
 
 ### Notes
 
