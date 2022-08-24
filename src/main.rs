@@ -1,4 +1,6 @@
+mod environment;
 mod error;
+mod interpreter;
 mod lexer;
 mod parser;
 mod parsetree;
