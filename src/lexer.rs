@@ -24,20 +24,24 @@ impl<'source> Lexer<'source> {
 
     pub fn next(&mut self) -> Result<Token, ParseError> {
         if let Some(peeked) = self.peeked.take() {
+            dbg!(&peeked);
             Ok(peeked)
         } else {
             match self.lexer.next() {
                 None => Err(ParseError::EOF),
-                Some(token) => Ok(token),
+                Some(token) => {
+                    dbg!(&token);
+                    Ok(token)
+                }
             }
         }
     }
 
-    pub fn peek(&mut self) -> &Option<Token> {
+    pub fn peek(&mut self) -> Option<Token> {
         if self.peeked.is_none() {
             self.peeked = self.lexer.next();
         }
-        &self.peeked
+        self.peeked.clone()
     }
 
     pub fn expect(&mut self, expected: Token) -> Result<(), ParseError> {
@@ -57,13 +61,13 @@ mod tests {
     fn peek_shows_the_next_token() {
         let mut lex = Lexer::from_source("1 2");
 
-        assert_eq!(*lex.peek(), Some(Token::Number(1)));
-        assert_eq!(*lex.peek(), Some(Token::Number(1)));
+        assert_eq!(lex.peek(), Some(Token::Number(1)));
+        assert_eq!(lex.peek(), Some(Token::Number(1)));
         assert_eq!(lex.next().unwrap(), Token::Number(1));
-        assert_eq!(*lex.peek(), Some(Token::Number(2)));
+        assert_eq!(lex.peek(), Some(Token::Number(2)));
         assert_eq!(lex.next().unwrap(), Token::Number(2));
-        assert_eq!(*lex.peek(), None);
+        assert_eq!(lex.peek(), None);
         assert!(lex.next().is_err());
-        assert_eq!(*lex.peek(), None);
+        assert_eq!(lex.peek(), None);
     }
 }

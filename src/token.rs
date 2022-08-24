@@ -9,6 +9,9 @@ pub enum Token {
     #[regex("(\"([^\"\\\\]|\\\\.)*\")", |lex| lex.slice()[1..lex.slice().len() - 1].parse())]
     LiteralString(String),
 
+    #[token(";")]
+    Semicolon,
+
     #[token("=")]
     Equal,
 
@@ -105,13 +108,19 @@ mod tests {
     fn function_definition() {
         let mut lex = Token::lexer(
             r#"
-            hello_world = () {
-            }
+            hello_world =
+                () { };
+                () { }
         "#,
         );
 
         assert_eq!(lex.next(), Some(Token::Id("hello_world".to_string())));
         assert_eq!(lex.next(), Some(Token::Equal));
+        assert_eq!(lex.next(), Some(Token::ParensLeft));
+        assert_eq!(lex.next(), Some(Token::ParensRight));
+        assert_eq!(lex.next(), Some(Token::BraceLeft));
+        assert_eq!(lex.next(), Some(Token::BraceRight));
+        assert_eq!(lex.next(), Some(Token::Semicolon));
         assert_eq!(lex.next(), Some(Token::ParensLeft));
         assert_eq!(lex.next(), Some(Token::ParensRight));
         assert_eq!(lex.next(), Some(Token::BraceLeft));

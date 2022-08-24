@@ -1,3 +1,4 @@
-Hello ? "wat"
+print = () { "Hello" };
+        () { "World" }
 
-Hello =
+f = (1) { f() }
