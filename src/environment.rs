@@ -32,6 +32,7 @@ impl Scope {
     }
 }
 
+#[derive(Debug)]
 pub struct Environment {
     current_scope: Scope,
 }

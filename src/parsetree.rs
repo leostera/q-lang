@@ -14,6 +14,7 @@ pub struct FunClause {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expression {
+    Variable(Id),
     LiteralString(String),
     Call { id: Id, args: Vec<Expression> },
     Function(Vec<FunClause>),

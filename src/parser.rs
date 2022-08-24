@@ -98,7 +98,14 @@ impl Parser {
 
     fn parse_expression(&self, lexer: &mut Lexer) -> Result<Expression, ParseError> {
         match lexer.peek() {
-            Some(Token::Id(_)) => self.parse_function_call(lexer),
+            Some(Token::Id(_)) => {
+                let id = self.parse_id(lexer)?;
+
+                match lexer.peek() {
+                    Some(Token::ParensLeft) => self.parse_function_call(lexer, id),
+                    _ => Ok(Expression::Variable(id)),
+                }
+            }
             Some(Token::LiteralString(str)) => {
                 lexer.next()?;
                 Ok(Expression::LiteralString(str))
@@ -133,12 +140,28 @@ impl Parser {
         Ok(FunClause { args, body })
     }
 
-    fn parse_function_call(&self, lexer: &mut Lexer) -> Result<Expression, ParseError> {
-        let id = self.parse_id(lexer)?;
+    fn parse_function_call(&self, lexer: &mut Lexer, id: Id) -> Result<Expression, ParseError> {
         lexer.expect(Token::ParensLeft)?;
-        // let args = self.parse_expression(lexer).map_err(|_| {
+
+        let mut args = vec![];
+        loop {
+            if let Some(Token::ParensRight) = lexer.peek() {
+                break;
+            }
+
+            let arg = self.parse_expression(lexer)?;
+            args.push(arg);
+
+            if let Some(Token::Comma) = lexer.peek() {
+                lexer.next()?;
+                continue;
+            }
+
+            break;
+        }
+
         lexer.expect(Token::ParensRight)?;
-        Ok(Expression::Call { id, args: vec![] })
+        Ok(Expression::Call { id, args })
     }
 
     fn parse_function_args(&self, lexer: &mut Lexer) -> Result<Vec<Pattern>, ParseError> {
@@ -341,6 +364,35 @@ mod tests {
                     body: Expression::Call {
                         id: Id("Print".to_string()),
                         args: vec![]
+                    }
+                }])
+            })]
+        );
+    }
+
+    #[test]
+    fn parse_module_with_a_function_call_with_arguments() {
+        let mut parser = Parser::from_string(
+            "test_module",
+            r#"
+                Print = (Arg) { Print(Arg) }
+            "#,
+        );
+        let module = parser.parse().unwrap();
+
+        assert_eq!(parser.diagnostics, vec![]);
+        assert_eq!(parser.diagnostics.len(), 0);
+        assert_eq!(module.name, Id("test_module".to_string()));
+        assert_eq!(module.items.len(), 1);
+        assert_eq!(
+            module.items,
+            vec![ModuleItem::ValueDeclaration(ValueDeclaration {
+                name: Id("Print".to_string()),
+                value: Expression::Function(vec![FunClause {
+                    args: vec![Pattern::Bind(Id("Arg".to_string()))],
+                    body: Expression::Call {
+                        id: Id("Print".to_string()),
+                        args: vec![Expression::Variable(Id("Arg".to_string()))]
                     }
                 }])
             })]

@@ -1,15 +1,15 @@
 # Captain's Log
 
+- [ ] skip ahead on a parse error
 - [ ] begin macro-expander
 
 ## Wed Aug 24 20:13:44 CEST 2022
 
-- [ ] skip ahead on a parse error
 - [X] parse the smallest set of constructs that make Q-lang turing complete
 - [X] add support for multiple function clauses to parser
 - [X] add support for pattern matching to parser
 - [X] sketch an environment with support for nested lexical scoping
-- [ ] begin a tiny interpreter
+- [X] begin a tiny interpreter
 
 
 ## Mon Aug 22 21:12:01 CEST 2022
