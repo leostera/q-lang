@@ -78,6 +78,31 @@ mod tests {
     use super::*;
 
     #[test]
+    fn env_can_lookup_on_parent_scope() {
+        let mut env = Environment::new();
+        let a = Id("a".to_string());
+        let first_str = Expression::LiteralString("hello".to_string());
+        env.bind(a.clone(), first_str.clone());
+        assert_eq!(env.lookup(a.clone()).unwrap(), first_str);
+        env.push_scope();
+        assert_eq!(env.lookup(a).unwrap(), first_str);
+    }
+
+    #[test]
+    fn env_can_not_lookup_on_child_scope() {
+        let mut env = Environment::new();
+        env.push_scope();
+        let a = Id("a".to_string());
+        let first_str = Expression::LiteralString("hello".to_string());
+        env.bind(a.clone(), first_str.clone());
+        assert!(matches!(env.lookup(a.clone()), Ok(expr) if expr == first_str));
+        env.pop_scope().unwrap();
+        assert!(
+            matches!(env.lookup(a.clone()), Err(EnvironmentError::UndefinedSymbol {id}) if id == a)
+        );
+    }
+
+    #[test]
     fn environment_variable_shadowing() {
         let mut env = Environment::new();
         let a = Id("a".to_string());

@@ -8,6 +8,7 @@
 - [X] parse the smallest set of constructs that make Q-lang turing complete
 - [X] add support for multiple function clauses to parser
 - [X] add support for pattern matching to parser
+- [X] sketch an environment with support for nested lexical scoping
 - [ ] begin a tiny interpreter
 
 
