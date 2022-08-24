@@ -11,6 +11,9 @@ pub enum ParseError {
     #[error("We were expecting an expression, but instead found: {found:?}")]
     ExpectedExpression { found: Token },
 
+    #[error("We were expecting a pattern, but instead found: {found:?}")]
+    ExpectedPattern { found: Token },
+
     #[error("When parsing module, we found a declaration without a value.")]
     #[diagnostic()]
     MissingValueInValueDeclaration {
@@ -38,6 +41,10 @@ impl PartialEq for ParseError {
                     found: r_found,
                 },
             ) => l_expected == r_expected && l_found == r_found,
+            (
+                Self::ExpectedPattern { found: l_found },
+                Self::ExpectedPattern { found: r_found },
+            ) => l_found == r_found,
             (
                 Self::ExpectedExpression { found: l_found },
                 Self::ExpectedExpression { found: r_found },

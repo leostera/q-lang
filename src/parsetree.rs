@@ -2,7 +2,9 @@
 pub struct Id(pub String);
 
 #[derive(Debug, PartialEq)]
-pub enum Pattern {}
+pub enum Pattern {
+    Bind(Id),
+}
 
 #[derive(Debug, PartialEq)]
 pub struct FunClause {

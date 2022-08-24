@@ -126,13 +126,11 @@ impl Parser {
     }
 
     fn parse_function_clause(&self, lexer: &mut Lexer) -> Result<FunClause, ParseError> {
-        lexer.expect(Token::ParensLeft)?;
-        // let args = self.parse_function_args(lexer)?;
-        lexer.expect(Token::ParensRight)?;
+        let args = self.parse_function_args(lexer)?;
         lexer.expect(Token::BraceLeft)?;
         let body = self.parse_expression(lexer)?;
         lexer.expect(Token::BraceRight)?;
-        Ok(FunClause { args: vec![], body })
+        Ok(FunClause { args, body })
     }
 
     fn parse_function_call(&self, lexer: &mut Lexer) -> Result<Expression, ParseError> {
@@ -141,6 +139,41 @@ impl Parser {
         // let args = self.parse_expression(lexer).map_err(|_| {
         lexer.expect(Token::ParensRight)?;
         Ok(Expression::Call { id, args: vec![] })
+    }
+
+    fn parse_function_args(&self, lexer: &mut Lexer) -> Result<Vec<Pattern>, ParseError> {
+        lexer.expect(Token::ParensLeft)?;
+        let mut patterns = vec![];
+
+        loop {
+            if let Some(Token::ParensRight) = lexer.peek() {
+                break;
+            }
+
+            let pattern = self.parse_pattern(lexer)?;
+            patterns.push(pattern);
+
+            if let Some(Token::Comma) = lexer.peek() {
+                lexer.next()?;
+                continue;
+            }
+
+            break;
+        }
+
+        lexer.expect(Token::ParensRight)?;
+        Ok(patterns)
+    }
+
+    fn parse_pattern(&self, lexer: &mut Lexer) -> Result<Pattern, ParseError> {
+        match lexer.peek() {
+            Some(Token::Id(_)) => {
+                let id = self.parse_id(lexer)?;
+                Ok(Pattern::Bind(id))
+            }
+            Some(token) => Err(ParseError::ExpectedPattern { found: token }),
+            None => Err(ParseError::EOF),
+        }
     }
 }
 
@@ -242,8 +275,9 @@ mod tests {
             r#"
                 Print =
                   () { "Joe" };
-                  () { "Robert" };
-                  () { "Mike" }
+                  (A) { "Robert" };
+                  (A, B) { "Mike" };
+                  (A, B, ) { "Bogdan" }
             "#,
         );
         let module = parser.parse().unwrap();
@@ -262,12 +296,22 @@ mod tests {
                         body: Expression::LiteralString("Joe".to_string())
                     },
                     FunClause {
-                        args: vec![],
+                        args: vec![Pattern::Bind(Id("A".to_string()))],
                         body: Expression::LiteralString("Robert".to_string())
                     },
                     FunClause {
-                        args: vec![],
+                        args: vec![
+                            Pattern::Bind(Id("A".to_string())),
+                            Pattern::Bind(Id("B".to_string())),
+                        ],
                         body: Expression::LiteralString("Mike".to_string())
+                    },
+                    FunClause {
+                        args: vec![
+                            Pattern::Bind(Id("A".to_string())),
+                            Pattern::Bind(Id("B".to_string())),
+                        ],
+                        body: Expression::LiteralString("Bogdan".to_string())
                     }
                 ])
             })]
@@ -279,7 +323,7 @@ mod tests {
         let mut parser = Parser::from_string(
             "test_module",
             r#"
-                Print = () { Print() }
+                Print = (Arg) { Print() }
             "#,
         );
         let module = parser.parse().unwrap();
@@ -293,7 +337,7 @@ mod tests {
             vec![ModuleItem::ValueDeclaration(ValueDeclaration {
                 name: Id("Print".to_string()),
                 value: Expression::Function(vec![FunClause {
-                    args: vec![],
+                    args: vec![Pattern::Bind(Id("Arg".to_string()))],
                     body: Expression::Call {
                         id: Id("Print".to_string()),
                         args: vec![]

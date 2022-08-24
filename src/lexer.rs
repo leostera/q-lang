@@ -24,15 +24,11 @@ impl<'source> Lexer<'source> {
 
     pub fn next(&mut self) -> Result<Token, ParseError> {
         if let Some(peeked) = self.peeked.take() {
-            dbg!(&peeked);
             Ok(peeked)
         } else {
             match self.lexer.next() {
                 None => Err(ParseError::EOF),
-                Some(token) => {
-                    dbg!(&token);
-                    Ok(token)
-                }
+                Some(token) => Ok(token),
             }
         }
     }

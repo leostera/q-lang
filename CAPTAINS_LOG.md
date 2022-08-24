@@ -5,9 +5,9 @@
 ## Wed Aug 24 20:13:44 CEST 2022
 
 - [ ] skip ahead on a parse error
-- [X] define the smallest set of constructs that make Q-lang turing complete
-- [X] add support for multiple function clauses
-- [ ] add support for pattern matching
+- [X] parse the smallest set of constructs that make Q-lang turing complete
+- [X] add support for multiple function clauses to parser
+- [X] add support for pattern matching to parser
 - [ ] begin a tiny interpreter
 
 
