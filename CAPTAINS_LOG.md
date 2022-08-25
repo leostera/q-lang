@@ -10,7 +10,7 @@
 - [X] add support for pattern matching to parser
 - [X] sketch an environment with support for nested lexical scoping
 - [X] begin a tiny interpreter
-
+- [x] hello world!
 
 ## Mon Aug 22 21:12:01 CEST 2022
 
