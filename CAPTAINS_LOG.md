@@ -1,5 +1,7 @@
 # Captain's Log
 
+## Mon Aug 29 20:45:53 CEST 2022
+
 - [ ] skip ahead on a parse error
 - [ ] begin macro-expander
 
