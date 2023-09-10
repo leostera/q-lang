@@ -1,3 +1,4 @@
+use q_core::diagnostic::Diagnostics;
 use crate::error::*;
 use crate::lexer::Lexer;
 use crate::parsetree::*;
@@ -34,14 +35,8 @@ impl Parser {
         }
     }
 
-    pub fn diagnostics(self) -> Result<(), Diagnostics> {
-        if self.diagnostics.is_empty() {
-            Ok(())
-        } else {
-            Err(Diagnostics {
-                errors: self.diagnostics,
-            })
-        }
+    pub fn diagnostics(&self) -> Vec<ParseError> {
+        self.diagnostics.clone()
     }
 
     pub fn parse(&mut self) -> Result<Module, ParseError> {

@@ -1,5 +1,5 @@
-use crate::parsetree::*;
-use crate::token::*;
+use q_parser::parsetree::*;
+use q_parser::token::*;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;

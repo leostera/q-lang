@@ -1,0 +1,18 @@
+[package]
+name = "qboot"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[[bin]]
+name = "qboot"
+path = "main.rs"
+
+[dependencies]
+inkwell = { version = "0.2.0", features = ["llvm15-0"] }
+lalrpop-util = { version = "0.20.0" , features = ["lexer", "unicode"] }
+llvm-tools = "0.1.1"
+zstd = "0.12.3"
+
+[build-dependencies]
+lalrpop = { version = "0.20.0" }

@@ -1,6 +1,6 @@
 use crate::environment::*;
-use crate::parsetree::*;
-use crate::token::*;
+use q_parser::parsetree::*;
+use q_parser::token::*;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -69,7 +69,7 @@ impl Interpreter {
             }
             Expression::Variable(id) => self
                 .env
-                .lookup(id.clone())
+                .lookup(id)
                 .map_err(InterpreterError::EnvironmentError),
             _ => Ok(expr),
         }
@@ -120,7 +120,7 @@ impl Interpreter {
 }
 
 mod tests {
-    use crate::parser::Parser;
+    use q_parser::Parser;
 
     use super::*;
 

@@ -1,9 +1,8 @@
-use crate::token::*;
-use miette::{Diagnostic, NamedSource, SourceSpan};
-use std::path::PathBuf;
+use miette::*;
 use thiserror::Error;
+use crate::token::Token;
 
-#[derive(Error, Diagnostic, Debug)]
+#[derive(Error, Clone, Debug)]
 pub enum ParseError {
     #[error("We were expecting a {expected:?}, but instead found: {found:?}")]
     UnexpectedSymbolFound { expected: Token, found: Token },
@@ -15,13 +14,9 @@ pub enum ParseError {
     ExpectedPattern { found: Token },
 
     #[error("When parsing module, we found a declaration without a value.")]
-    #[diagnostic()]
     MissingValueInValueDeclaration {
-        #[label("We expected a value right here")]
         span: SourceSpan,
-
-        #[source_code]
-        src: NamedSource,
+        src: String,
     },
 
     #[error("We reached the end of the file")]
@@ -58,10 +53,4 @@ impl PartialEq for ParseError {
     }
 }
 
-#[derive(Error, Diagnostic, Debug)]
-#[error("Multiple Errors")]
-#[diagnostic()]
-pub struct Diagnostics {
-    #[related]
-    pub errors: Vec<ParseError>,
-}
+impl q_core::diagnostic::Diagnostic for ParseError {}

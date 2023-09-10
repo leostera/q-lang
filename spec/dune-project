@@ -1,0 +1,11 @@
+(lang dune 3.10)
+
+(name qlang)
+
+(source (github leostera/q-lang))
+
+(package
+ (name qlang)
+ (synopsis "A short synopsis")
+ (description "A longer description")
+ (depends ocaml dune))

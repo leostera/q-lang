@@ -1,0 +1,18 @@
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+
+[[bin]]
+name = "q"
+path = "main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+q-parser = { path = "../parser", version = "*" }
+q-typer = { path = "../typer", version = "*" }
+q-macros = { path = "../macros", version = "*" }
+miette.workspace = true
+thiserror.workspace = true
